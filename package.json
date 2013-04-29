@@ -1,0 +1,24 @@
+{
+    "name": "blockchain-wallet",
+    "description": "blockchain.info wallet API client for node.js",
+    "version": "0.0.1",
+    "keywords": ["btc", "bitcoin", "blockchain", "wallet"],
+    "author": "Preston Skupinski",
+    "licenses": [
+      {
+        "type": "ISC",
+        "url": "https://github.com/scud43/node-blockchain-wallet/blob/master/LICENSE.txt"
+      }
+    ],
+    "dependencies": {
+      "request": "2.16.6"
+    },
+    "main": "blockchain-wallet.js",
+    "engines": {
+      "node": "~0.10"
+    },
+    "repository": {
+      "type": "git",
+      "url": "https://github.com/scud43/node-blockchain-wallet"
+    }
+}

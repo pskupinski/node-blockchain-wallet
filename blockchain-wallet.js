@@ -1,10 +1,10 @@
 var request = require("request"),
     querystring = require("querystring");
 
-var BlockchainWallet = function(guid, main_password) {
+var BlockchainWallet = function(guid, mainPassword) {
   var self = this;
   self.guid = guid;
-  self.main_password = main_password;
+  self.mainPassword = mainPassword;
   self.url = "https://blockchain.info/merchant/";
 
   self.makeRequest = function(method, params, callback) {
@@ -20,6 +20,7 @@ var BlockchainWallet = function(guid, main_password) {
 
       if(result.error) {
         callback(result.error);
+        return;
       }
 
       callback(false, result);
@@ -27,8 +28,20 @@ var BlockchainWallet = function(guid, main_password) {
   };
 
   self.balance = function(callback) {
-    self.makeRequest("balance", { "password": self.main_password }, callback);
-  }
+    self.makeRequest("balance", { "password": self.mainPassword }, callback);
+  };
+
+  self.list = function(callback) {
+    self.makeRequest("list", { "password": self.mainPassword }, callback);
+  };
+
+  self.addressBalance = function(address, confirmations, callback) {
+    self.makeRequest("address_balance", {
+      "password": self.mainPassword,
+      "address": address,
+      "confirmations": confirmations
+    }, callback);
+  };
 }
 
 module.exports = BlockchainWallet;

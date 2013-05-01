@@ -1,10 +1,11 @@
 var request = require("request"),
     querystring = require("querystring");
 
-var BlockchainWallet = function(guid, mainPassword) {
+var BlockchainWallet = function(guid, mainPassword, secondPassword) {
   var self = this;
   self.guid = guid;
   self.mainPassword = mainPassword;
+  self.secondPassword = secondPassword;
   self.url = "https://blockchain.info/merchant/";
 
   self.makeRequest = function(method, params, callback) {
@@ -41,6 +42,20 @@ var BlockchainWallet = function(guid, mainPassword) {
       "address": address,
       "confirmations": confirmations
     }, callback);
+  };
+
+  self.payment = function(to, amount, params, callback) {
+    params.to = to;
+    params.amount = amount;
+
+    if(self.secondPassword) {
+      params.main_password = self.mainPassword;
+      params.second_password = self.secondPassword;
+    } else {
+      params.password = self.mainPassword;
+    }
+
+    self.makeRequest("payment", params, callback);
   };
 }
 

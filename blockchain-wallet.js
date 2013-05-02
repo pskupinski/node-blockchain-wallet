@@ -8,7 +8,13 @@ var BlockchainWallet = function(guid, mainPassword, secondPassword) {
   self.secondPassword = secondPassword;
   self.url = "https://blockchain.info/merchant/";
 
-  self.makeRequest = function(method, params, callback) {
+  self.makeRequest = function(method, secondPasswordApplicable, params, callback) {
+    params.password = self.mainPassword;
+
+    if(secondPasswordApplicable && self.secondPassword) {
+      params.second_password = self.secondPassword;
+    }
+
     var queryString = querystring.stringify(params);
     url = self.url + self.guid + "/" + method + "?" + queryString;
     request(url, function(err, response, body) {
@@ -29,16 +35,15 @@ var BlockchainWallet = function(guid, mainPassword, secondPassword) {
   };
 
   self.balance = function(callback) {
-    self.makeRequest("balance", { "password": self.mainPassword }, callback);
+    self.makeRequest("balance", false, {}, callback);
   };
 
   self.list = function(callback) {
-    self.makeRequest("list", { "password": self.mainPassword }, callback);
+    self.makeRequest("list", false, {}, callback);
   };
 
   self.addressBalance = function(address, confirmations, callback) {
-    self.makeRequest("address_balance", {
-      "password": self.mainPassword,
+    self.makeRequest("address_balance", false, {
       "address": address,
       "confirmations": confirmations
     }, callback);
@@ -48,15 +53,30 @@ var BlockchainWallet = function(guid, mainPassword, secondPassword) {
     params.to = to;
     params.amount = amount;
 
-    if(self.secondPassword) {
-      params.main_password = self.mainPassword;
-      params.second_password = self.secondPassword;
-    } else {
-      params.password = self.mainPassword;
-    }
-
-    self.makeRequest("payment", params, callback);
+    self.makeRequest("payment", true, params, callback);
   };
-}
+
+  self.sendMany = function(recipients, params, callback) {
+    params.recipients = JSON.stringify(recipients);
+
+    self.makeRequest("sendmany", true, params, callback);
+  };
+
+  self.newAddress = function(params, callback) {
+    self.makeRequest("new_address", true, params, callback);
+  };
+
+  self.archiveAddress = function(address, callback) {
+    self.makeRequest("archive_address", true, { "address": address }, callback);
+  };
+
+  self.unarchiveAddress = function(address, callback) {
+    self.makeRequest("unarchive_address", true, { "address": address }, callback);
+  };
+
+  self.autoConsolidate = function(days, callback) {
+    self.makeRequest("auto_consolidate", true, { "days": days }, callback);
+  };
+};
 
 module.exports = BlockchainWallet;

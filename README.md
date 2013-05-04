@@ -31,4 +31,4 @@ transactionBlockchainWallet.payment("1JArS6jzE3AJ9sZ3aFij1BmTcpFGgN86hA", 500, {
 
 ## License
 
-This module is [ISC licensed](https://github.com/scud43/node-blockchain/wallet/blob/master/LICENSE.txt).
+This module is [ISC licensed](https://github.com/scud43/node-blockchain-wallet/blob/master/LICENSE.txt).

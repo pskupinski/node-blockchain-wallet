@@ -1,7 +1,7 @@
 {
     "name": "blockchain-wallet",
     "description": "blockchain.info wallet API client for node.js",
-    "version": "0.0.2",
+    "version": "0.0.3",
     "keywords": ["btc", "bitcoin", "blockchain", "wallet"],
     "author": "Preston Skupinski",
     "licenses": [

@@ -30,7 +30,7 @@ var BlockchainWallet = function(guid, mainPassword, secondPassword) {
         return;
       }
 
-      callback(false, result);
+      callback(null, result);
     });
   };
 

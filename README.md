@@ -3,6 +3,14 @@ node-blockchain-wallet
 
 An unofficial node.js client for the [blockchain.info wallet api](http://blockchain.info/api/blockchain_wallet_api).
 
+## Installation
+
+node-blockchain-wallet is available as `blockchain-wallet` on npm.
+
+```
+npm install blockchain-wallet
+```
+
 ## Usage
 
 ```javascript

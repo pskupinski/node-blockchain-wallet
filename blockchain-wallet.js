@@ -1,82 +1,85 @@
-var request = require("request"),
-    querystring = require("querystring");
+var request = require('request'),
+    querystring = require('querystring');
 
 var BlockchainWallet = function(guid, mainPassword, secondPassword) {
+  this.guid = guid;
+  this.mainPassword = mainPassword;
+  this.secondPassword = secondPassword;
+  this.url = 'https://blockchain.info/merchant/';
+};
+
+BlockchainWallet.prototype.makeRequest = function(method, secondPasswordApplicable, params, callback) {
   var self = this;
-  self.guid = guid;
-  self.mainPassword = mainPassword;
-  self.secondPassword = secondPassword;
-  self.url = "https://blockchain.info/merchant/";
+  params.password = self.mainPassword;
 
-  self.makeRequest = function(method, secondPasswordApplicable, params, callback) {
-    params.password = self.mainPassword;
+  if(secondPasswordApplicable && self.secondPassword) {
+    params.second_password = self.secondPassword;
+  }
 
-    if(secondPasswordApplicable && self.secondPassword) {
-      params.second_password = self.secondPassword;
+  var queryString = querystring.stringify(params);
+  var url = self.url + self.guid + '/' + method + '?' + queryString;
+  request(url, function(err, response, body) {
+    if(err || response.statusCode !== 200) {
+      return callback(new Error(err ? err : response.statusCode));
     }
 
-    var queryString = querystring.stringify(params);
-    url = self.url + self.guid + "/" + method + "?" + queryString;
-    request(url, function(err, response, body) {
-      if(err || response.statusCode !== 200) {
-        callback(err ? err : response.statusCode);
-        return;
-      }
+    var result;
+    try {
+      result = JSON.parse(body);
+    } catch (error) {
+      return callback(error);
+    }
 
-      var result = JSON.parse(body);
+    if(result.error) {
+      return callback(new Error(result.error));
+    }
 
-      if(result.error) {
-        callback(result.error);
-        return;
-      }
+    callback(null, result);
+  });
+};
 
-      callback(null, result);
-    });
-  };
+BlockchainWallet.prototype.balance = function(callback) {
+  this.makeRequest('balance', false, {}, callback);
+};
 
-  self.balance = function(callback) {
-    self.makeRequest("balance", false, {}, callback);
-  };
+BlockchainWallet.prototype.list = function(callback) {
+  this.makeRequest('list', false, {}, callback);
+};
 
-  self.list = function(callback) {
-    self.makeRequest("list", false, {}, callback);
-  };
+BlockchainWallet.prototype.addressBalance = function(address, confirmations, callback) {
+  this.makeRequest('address_balance', false, {
+    'address': address,
+    'confirmations': confirmations
+  }, callback);
+};
 
-  self.addressBalance = function(address, confirmations, callback) {
-    self.makeRequest("address_balance", false, {
-      "address": address,
-      "confirmations": confirmations
-    }, callback);
-  };
+BlockchainWallet.prototype.payment = function(to, amount, params, callback) {
+  params.to = to;
+  params.amount = amount;
 
-  self.payment = function(to, amount, params, callback) {
-    params.to = to;
-    params.amount = amount;
+  this.makeRequest('payment', true, params, callback);
+};
 
-    self.makeRequest("payment", true, params, callback);
-  };
+BlockchainWallet.prototype.sendMany = function(recipients, params, callback) {
+  params.recipients = JSON.stringify(recipients);
 
-  self.sendMany = function(recipients, params, callback) {
-    params.recipients = JSON.stringify(recipients);
+  this.makeRequest('sendmany', true, params, callback);
+};
 
-    self.makeRequest("sendmany", true, params, callback);
-  };
+BlockchainWallet.prototype.newAddress = function(params, callback) {
+  this.makeRequest('new_address', true, params, callback);
+};
 
-  self.newAddress = function(params, callback) {
-    self.makeRequest("new_address", true, params, callback);
-  };
+BlockchainWallet.prototype.archiveAddress = function(address, callback) {
+  this.makeRequest('archive_address', true, { 'address': address }, callback);
+};
 
-  self.archiveAddress = function(address, callback) {
-    self.makeRequest("archive_address", true, { "address": address }, callback);
-  };
+BlockchainWallet.prototype.unarchiveAddress = function(address, callback) {
+  this.makeRequest('unarchive_address', true, { 'address': address }, callback);
+};
 
-  self.unarchiveAddress = function(address, callback) {
-    self.makeRequest("unarchive_address", true, { "address": address }, callback);
-  };
-
-  self.autoConsolidate = function(days, callback) {
-    self.makeRequest("auto_consolidate", true, { "days": days }, callback);
-  };
+BlockchainWallet.prototype.autoConsolidate = function(days, callback) {
+  this.makeRequest('auto_consolidate', true, { 'days': days }, callback);
 };
 
 module.exports = BlockchainWallet;

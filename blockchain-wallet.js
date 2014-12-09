@@ -1,10 +1,11 @@
 var request = require('request'),
     querystring = require('querystring');
 
-function BlockchainWallet(guid, mainPassword, secondPassword) {
+function BlockchainWallet(guid, mainPassword, secondPassword, apiCode) {
   this.guid = guid;
   this.mainPassword = mainPassword;
   this.secondPassword = secondPassword;
+  if (apiCode) this.apiCode = apiCode;
   this.url = 'https://blockchain.info/merchant/';
 }
 
@@ -15,6 +16,7 @@ BlockchainWallet.prototype.makeRequest = function(method, secondPasswordApplicab
   if(secondPasswordApplicable && self.secondPassword) {
     params.second_password = self.secondPassword;
   }
+  if (self.apiCode) params.api_code = self.apiCode;
 
   var queryString = querystring.stringify(params);
   var url = self.url + self.guid + '/' + method + '?' + queryString;
